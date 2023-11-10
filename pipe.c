@@ -14,26 +14,35 @@ int handel_pipe(char *argv[])
 	char *new_argv[] = { NULL };
 	char *new_envp[] = { NULL };
 	
-	read = getline(&line, &n, stdin);
+	while(1)
+	{
+		read = getline(&line, &n, stdin);
 
-	line[read - 1] = '\0';
+		if (read == -1)
+		{
+			break;
+		}
+		line[read - 1] = '\0';
 
-	/* fork the current process to create the child */
-	pid = fork();
-	if (pid == 0)
-	{
-		/* this the child */
-		execve(line, new_argv, new_envp);
-		printf("%s: No such file or directory\n", argv[0]);
-	} else if (pid > 0)
-	{
-		/* this is the parent and pid is child pid */
-		wait(&wstatus);
-	} else
-	{
-		/* faild to fork */
-		free(line);
-		exit(EXIT_FAILURE);
+		/* fork the current process to create the child */
+		pid = fork();
+		if (pid == 0)
+		{
+			/* this the child */
+			execve(line, new_argv, new_envp);
+			printf("%s: No such file or directory\n", argv[0]);
+			free(line);
+			exit(EXIT_SUCCESS);
+		} else if (pid > 0)
+		{
+			/* this is the parent and pid is child pid */
+			wait(&wstatus);
+		} else
+		{
+			/* faild to fork */
+			free(line);
+			exit(EXIT_FAILURE);
+		}
 	}
 
 	free(line);
