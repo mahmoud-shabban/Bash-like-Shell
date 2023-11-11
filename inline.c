@@ -3,16 +3,30 @@
 
 /**
  * handel_inline - handle piped values or inline commands 
- * @argv - the cmd args passed
+ * @argv: the cmd args passed
  * Return: the absolute value of int
  */
 
 int handel_inline(int argc, char *argv[])
 {
-	int wstatus = 0, pid;
-	char **new_argv;
+	int wstatus = 0, pid, s_stat;
+	char **new_argv, *new_program;
 	char *new_envp[] = { NULL };
-	
+	struct stat sb;
+
+	/* determine if the path is found or not */
+	s_stat = stat(argv[1], &sb);
+	if (s_stat == 0)
+		new_program = argv[1];
+	else
+		new_program = search_path(argv[1]);
+
+	if (new_program == NULL)
+	{
+		printf("No such file or directory\n");
+		exit(EXIT_FAILURE);
+	}
+
 
 	/* fork the current process to create the child */
 	pid = fork();
@@ -26,7 +40,7 @@ int handel_inline(int argc, char *argv[])
 			exit(EXIT_FAILURE);
 		}
 
-		execve(argv[1], new_argv, new_envp);
+		execve(new_program, new_argv, new_envp);
 		perror(argv[0]);
 		exit(EXIT_FAILURE);
 
