@@ -22,7 +22,7 @@ int main (int argc, char *argv[])
 		handel_pipe(argv);
 	} else if (argc > 1)
 	{
-		handel_inline(argv);
+		handel_inline(argc, argv);
 	} else
 	{
 		prompt(argv);

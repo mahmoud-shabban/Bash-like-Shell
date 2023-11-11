@@ -6,12 +6,14 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <string.h>
 #define _GNU_SOURCE
 
 #include <unistd.h>
 
-int handel_inline(char *argv[]);
+int handel_inline(int argc, char *argv[]);
 int handel_pipe(char *argv[]);
 int prompt(char *argv[]);
+char **get_new_argv(int argc, char *const argv[]);
 
 #endif

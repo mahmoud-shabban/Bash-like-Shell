@@ -7,10 +7,10 @@
  * Return: the absolute value of int
  */
 
-int handel_inline(char *argv[])
+int handel_inline(int argc, char *argv[])
 {
 	int wstatus = 0, pid;
-	char *new_argv[] = { NULL };
+	char **new_argv;
 	char *new_envp[] = { NULL };
 	
 
@@ -19,8 +19,17 @@ int handel_inline(char *argv[])
 	if (pid == 0)
 	{
 		/* this the child */
+		new_argv = get_new_argv(argc, argv);
+		if (new_argv == NULL)
+		{
+			perror(argv[0]);
+			exit(EXIT_FAILURE);
+		}
+
 		execve(argv[1], new_argv, new_envp);
-		printf("%s: No such file or directory\n", argv[0]);
+		perror(argv[0]);
+		exit(EXIT_FAILURE);
+
 	} else if (pid > 0)
 	{
 		/* this is the parent and pid is child pid */

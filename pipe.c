@@ -30,9 +30,9 @@ int handel_pipe(char *argv[])
 		{
 			/* this the child */
 			execve(line, new_argv, new_envp);
-			printf("%s: No such file or directory\n", argv[0]);
+			perror(argv[0]);
 			free(line);
-			exit(EXIT_SUCCESS);
+			exit(EXIT_FAILURE);
 		} else if (pid > 0)
 		{
 			/* this is the parent and pid is child pid */
