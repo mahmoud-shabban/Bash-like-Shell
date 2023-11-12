@@ -11,7 +11,7 @@
 
 `echo "ls -la" | ./my_shell`
 
-`./my_shell`
+```./my_shell```
 
 #### To compile the code yourself:
 
