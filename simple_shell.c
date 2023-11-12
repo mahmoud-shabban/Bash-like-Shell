@@ -9,7 +9,7 @@
  * Return: nothing
  */
 
-int main (int argc, char *argv[])
+int main(int argc, char *argv[], char *env[])
 {
 
 	int tty;
@@ -25,7 +25,7 @@ int main (int argc, char *argv[])
 		handel_inline(argc, argv);
 	} else
 	{
-		prompt(argv);
+		prompt(argv, env);
 	}
 
 	return (0);

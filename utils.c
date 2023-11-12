@@ -1,7 +1,7 @@
 #include "shell.h"
 
 /**
- * get_new_argv - slice the original argv to be passed to exeve
+ * get_new_argv - slice the original argv inline mode to be passed to exeve
  * @argc: the original argc
  * @argv:  the cmd args passed
  * Return: new argv vector
@@ -82,33 +82,112 @@ char *_strcat(char *dest, char *src)
 
 
 /**
- * _strcat - concat dest + / + src
- * @dest: first string
- * @src: second string
+ * search_path - concat dest + / + src
+ * @argv: the cmd args vector
+ * @file: the program file passed by user
  * Return: new concated string
  */
 
 
-char *search_path(char *file)
+char *search_path(char **argv, char *file)
 {
 	char *path, *tok, *tmp_str, *full_file_path;
-	int i, s_stat;
+	int i, s_stat, path_len;
 	struct stat sb;
 
 
 	path = getenv("PATH");
+	path_len = strlen(path);
 
-	for (i = 0, tmp_str = path; ; i++, tmp_str = NULL) 
+	tmp_str = malloc(sizeof(char) * (path_len + 1));
+	if (!tmp_str)
+	{
+		perror("search path");
+		return (NULL);
+	}
+
+	strcpy(tmp_str, path);
+
+	for (i = 0; ; i++, tmp_str = NULL)
 	{
 		tok = strtok(tmp_str, ":");
 
 		if (tok == NULL)
+		{
+			perror(argv[0]);
 			return (NULL);
+		}
 		full_file_path = _strcat(tok, file);
 		s_stat = stat(full_file_path, &sb);
-		
+
 		if (s_stat == 0)
 			return (full_file_path);
 	}
 
+}
+
+
+
+/**
+ * line_to_argv - split the line read from stdin (pipe & interacgive mode)
+ * @line: the program file passed by user
+ * Return: new argument vector (argv)
+ */
+
+char **line_to_argv(char *line)
+{
+	char **new_argv, *tok, *tmp_line;
+	int i;
+
+	new_argv = malloc(sizeof(char *) * MAX_SIZE);
+	if (!new_argv)
+		return (NULL);
+
+	for (i = 0, tmp_line = line; i < MAX_SIZE - 1; i++, tmp_line = NULL)
+	{
+		new_argv[i] = NULL;
+		tok = strtok(tmp_line, " ");
+
+		if (tok == NULL)
+			break;
+
+		new_argv[i] = tok;
+	}
+
+	if (i > 0 && i < MAX_SIZE - 1)
+	{
+		/* this when tok == NULL caused break */
+		/* no need to add NULL at the end it is there */
+		return (new_argv);
+	} else if (i > 0 && i == MAX_SIZE - 1)
+	{
+		/* to handle the case where #args > MAX_SIZE */
+		new_argv[i] = NULL;
+		return (new_argv);
+	}
+
+	free(new_argv);
+	return (NULL);
+
+}
+
+
+
+
+
+
+
+/**
+ * check_exit - split the line read from stdin (pipe & interacgive mode)
+ * @program: the program file passed by user
+ * Return: Nothing
+ */
+
+void check_exit(char *program)
+{
+	char *test = "exit";
+	/* int strcmp(const char *s1, const char *s2); */
+
+	if (strcmp(test, program) == 0)
+		exit(EXIT_SUCCESS);
 }

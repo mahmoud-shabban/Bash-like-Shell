@@ -1,2 +1,5 @@
 /bin/ls
+/bin/who
 /bin/pwd
+tty
+

@@ -2,7 +2,7 @@
 
 /**
  * handel_pipe - handle piped values or inline commands 
- * @argv - the cmd args passed
+ * @argv: - the cmd args passed
  * Return: the absolute value of int
  */
 
@@ -10,26 +10,42 @@ int handel_pipe(char *argv[])
 {
 	char *line = NULL;
 	size_t n = 0;
-	int wstatus = 0, pid, read;
-	char *new_argv[] = { NULL };
+	int wstatus = 0, pid, read, s_stat;
+	char **new_argv, *new_program;
 	char *new_envp[] = { NULL };
-	
+	struct stat sb;
+
 	while(1)
 	{
 		read = getline(&line, &n, stdin);
 
 		if (read == -1)
-		{
+			/* failed to read */
 			break;
-		}
-		line[read - 1] = '\0';
+		if (read == 1)
+			/* only new line char is read */
+			continue;
 
+		line[read - 1] = '\0';
+		new_argv = line_to_argv(line);
+
+		if (new_argv)
+		{
+			s_stat = stat(new_argv[0], &sb);
+			if (s_stat != 0)
+			{
+				new_program = search_path(argv, new_argv[0]);
+				if (!new_program)
+					continue;
+			} else
+				new_program = new_argv[0];
+		}
 		/* fork the current process to create the child */
 		pid = fork();
 		if (pid == 0)
 		{
 			/* this the child */
-			execve(line, new_argv, new_envp);
+			execve(new_program, new_argv, new_envp);
 			perror(argv[0]);
 			free(line);
 			exit(EXIT_FAILURE);
